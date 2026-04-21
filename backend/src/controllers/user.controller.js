@@ -37,4 +37,22 @@ const registerUser = async (req, res) => {
   }
 };
 
+const loginUser = async (req, res) => {
+  try {
+    //validation 1: user already exist validation
+    const { email, password } = req.body;
+
+    const user = await User.findOne({
+      email: email.toLowerCase(),
+    });
+    if (!user)
+      return res.staus(400).json({
+        messge: "User not found",
+      });
+
+      //validation 2: compare passwords
+      
+  } catch (error) {}
+};
+
 export { registerUser };

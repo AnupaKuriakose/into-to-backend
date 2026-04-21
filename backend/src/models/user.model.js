@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new Schema(
   {
@@ -29,5 +30,22 @@ const userSchema = new Schema(
     timestamps: true, //always get timestamps, when user get craeted
   },
 );
+//before saving the password hash it
+//pre - means before saving, call this async func
+userSchema.pre("save", async function (next) {
+  // if password is modified/updated then need to hash it again otherwise no need
+  if (!this.isModified("password")) return next();
+  //here 10 is second param - @param saltOrRounds
+  //The salt to be used in encryption. If specified as a number then a salt will be generated with the specified number of rounds and used.
+  //here 10 saltorounds to hashpasswords we can increase or decrease it
+
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+//compare passowrds
+userSchema.methods.comparePassword = async function(password)
+{
+  return await bcrypt.compare(password, this.password);
+}
 
 export const User = mongoose.model("User", userSchema);
